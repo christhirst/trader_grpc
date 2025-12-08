@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: docker.io
   # TODO: Update with actual image name if different
-  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/trader
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME}}/trader
 
 jobs:
   build:
