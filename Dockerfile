@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y protobuf-compiler && rm -rf /var/lib/ap
 WORKDIR /usr/src/trader-bot
 
 # Copy manifests
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml ./
 
 # Create dummy main to build dependencies
 RUN mkdir src && echo "fn main() {}" > src/main.rs
