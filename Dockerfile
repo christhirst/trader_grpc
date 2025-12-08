@@ -1,4 +1,4 @@
-# Builder stage
+# Builder stage 
 FROM docker.io/library/rust:latest AS builder
 
 # Install protobuf compiler for tonic-build
