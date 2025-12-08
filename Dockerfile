@@ -1,5 +1,5 @@
 # Builder stage
-FROM docker.io/library/rust:1.81 as builder
+FROM docker.io/library/rust:1.81 AS builder
 
 # Install protobuf compiler for tonic-build
 RUN apt-get update && apt-get install -y protobuf-compiler && rm -rf /var/lib/apt/lists/*
