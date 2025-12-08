@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package depot;
+
+service Depot {
+  rpc Deposit (DepositRequest) returns (TransactionResponse);
+  rpc Withdraw (WithdrawRequest) returns (TransactionResponse);
+  rpc BuyShares (BuyRequest) returns (TransactionResponse);
+  rpc SellShares (SellRequest) returns (TransactionResponse);
+  rpc GetState (Empty) returns (StateResponse);
+  rpc GetGain (Empty) returns (GainResponse);
+  rpc GetShareBalance (Empty) returns (ShareBalanceResponse);
+}
+
+message Empty {}
+
+message DepositRequest {
+  double amount = 1;
+}
+
+message WithdrawRequest {
+  double amount = 1;
+}
+
+message BuyRequest {
+  int32 count = 1;
+  double price_per_share = 2;
+  string symbol = 3;
+}
+
+message SellRequest {
+  int32 count = 1;
+  double price_per_share = 2;
+  string symbol = 3;
+}
+
+message TransactionResponse {
+  bool success = 1;
+  string message = 2;
+  double current_cash = 3;
+  // Deprecated single share count, might remove or keep as total? 
+  // Let's keep it as total items for backward compat in the struct, but we really should start returning details.
+  // For now let's just return total shares count as a simple sum if possible, or 0.
+  int32 current_shares = 4; 
+}
+
+message StateResponse {
+  double cash = 1;
+  // Total shares count (legacy)
+  int32 shares = 2;
+  repeated string history = 3;
+}
+
+message GainResponse {
+  double total_deposited = 1;
+  double current_cash = 2;
+  double gain = 3;
+}
+
+message ShareDetails {
+  string symbol = 1;
+  int32 count = 2;
+}
+
+message ShareBalanceResponse {
+  repeated ShareDetails shares = 1;
+}

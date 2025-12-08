@@ -1,0 +1,18 @@
+[package]
+name = "trader-bot"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+apca = "0.30"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+tonic = "0.13"
+prost = "0.13"
+rand = "0.8"
+futures = "0.3"
+num-traits = "0.2"
+
+[build-dependencies]
+tonic-build = "0.13"
