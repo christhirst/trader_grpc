@@ -30,7 +30,8 @@ RUN cargo build --release
 
 # Runtime stage
 FROM docker.io/library/debian:bookworm-slim
-COPY --from=builder /usr/src/trader-bot/config /app/trader-bot/config 
+#Copy config
+COPY --from=builder /usr/src/trader-bot/config /app/config
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*
