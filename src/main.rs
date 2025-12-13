@@ -3,9 +3,10 @@ use apca::{ApiInfo, Client, Error};
 use futures::{FutureExt, StreamExt, TryStreamExt};
 
 use rand::Rng;
-use tonic::transport::{Channel, Endpoint};
-use tracing::{error, info, Level};
+use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
+mod broker;
+mod decisions;
 
 pub mod depot {
     tonic::include_proto!("depot");
@@ -17,7 +18,9 @@ use depot::depot_client::DepotClient;
 use depot::{BuyRequest, SellRequest};
 use settings::Settings;
 
-async fn trader(mut client: DepotClient<Channel>, data: Data<Bar, Quote, Trade>) {
+use crate::broker::actions::Alpaca;
+
+async fn trader(client: &mut Alpaca, data: Data<Bar, Quote, Trade>) {
     info!("Received data: {:?}", data);
     match data {
         Data::Trade(trade) => {
@@ -35,10 +38,11 @@ async fn trader(mut client: DepotClient<Channel>, data: Data<Bar, Quote, Trade>)
                         count,
                         price_per_share: price,
                     };
-                    match client.buy_shares(req).await {
-                        Ok(res) => info!("Buy Response: {:?}", res.into_inner()),
-                        Err(e) => error!("Buy RPC error: {:?}", e),
-                    }
+                    client.buy(req);
+                    // match client.buy_shares(req).await {
+                    //     Ok(res) => info!("Buy Response: {:?}", res.into_inner()),
+                    //     Err(e) => error!("Buy RPC error: {:?}", e),
+                    // }
                 } else {
                     // Sell
                     info!(
@@ -50,18 +54,15 @@ async fn trader(mut client: DepotClient<Channel>, data: Data<Bar, Quote, Trade>)
                         count,
                         price_per_share: price,
                     };
-                    match client.sell_shares(req).await {
-                        Ok(res) => info!("Sell Response: {:?}", res.into_inner()),
-                        Err(e) => error!("Sell RPC error: {:?}", e),
-                    }
+                    client.sell(req);
                 }
             }
         }
         Data::Bar(_) => {
-            todo!()
+            print!("test");
         }
         Data::Quote(_) => {
-            todo!()
+            print!("test");
         }
         _ => {}
     }
@@ -86,17 +87,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Connect to Depot
     info!("Connecting to Depot at {}", depot_url);
     let mut depot_client = DepotClient::connect(depot_url).await?;
-    info!("Connected to Depot");
-
     // Setup Alpaca
     info!("Connecting to Alpaca");
+    //TODO put in function
     let api_info = ApiInfo::from_parts(api_base, api_key, api_secret)?;
-    let client = Client::new(api_info);
-    let (mut stream, mut subscription) = client
+    let client_broker = Client::new(api_info);
+    let (mut stream, mut subscription) = client_broker
         .subscribe::<RealtimeData<IEX, Bar, Quote, Trade>>()
         .await?;
-    info!("Connected to Alpaca");
-
     let symbol = "AAPL";
     let mut market_data = MarketData::default();
     market_data.set_trades([symbol]);
@@ -113,17 +111,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap()
         .unwrap();
 
+    let client = &Alpaca {
+        client: depot_client,
+        account: client_broker.into(),
+    };
+
+    info!("Connected to Alpaca");
+
     info!("Stream started...");
 
     let () = stream
         // Stop after receiving 50 updates.
         .map_err(Error::WebSocket)
         .try_for_each(|result| {
-            let client = depot_client.clone();
+            //let client = client;
             async move {
                 match result {
                     Ok(data) => {
-                        trader(client, data).await;
+                        trader(&mut client.clone(), data).await;
                         Ok(())
                     }
                     Err(e) => Err(Error::Json(e)),

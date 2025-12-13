@@ -8,6 +8,8 @@ pub fn random_action() {
 
 #[cfg(test)]
 mod tests {}
+use rand::Rng;
+
 use super::*;
 
 #[test]
