@@ -1,62 +1,38 @@
 use apca::data::v2::stream::{drive, Bar, Data, MarketData, Quote, RealtimeData, Trade, IEX};
-use apca::{ApiInfo, Client, Error};
+use apca::{data, ApiInfo, Client, Error};
 use futures::{FutureExt, StreamExt, TryStreamExt};
 
-use rand::Rng;
 use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
 mod broker;
 mod decisions;
 
-pub mod depot {
-    tonic::include_proto!("depot");
-}
-
 mod settings;
 
 use depot::depot_client::DepotClient;
-use depot::{BuyRequest, SellRequest};
 use settings::Settings;
+use trader_bot::grpc_depot::init::depot;
 
 use crate::broker::actions::Alpaca;
+
+fn buffer<T>(size: usize, data: T) -> Vec<T> {
+    let mut buf = vec![];
+
+    if buf.len() >= size {
+        buf.pop();
+    }
+    buf.push(data);
+
+    buf
+}
 
 async fn trader(client: &mut Alpaca, data: Data<Bar, Quote, Trade>) {
     info!("Received data: {:?}", data);
     match data {
         Data::Trade(trade) => {
-            let mut rng = rand::thread_rng();
-            if rng.gen_bool(0.1) {
-                let symbol = trade.symbol;
-                let price = trade.trade_price.to_f64().unwrap_or(0.0);
-                let count = 1;
-
-                if rng.gen_bool(0.5) {
-                    // Buy
-                    info!("Decided to BUY {} shares of {} at {}", count, symbol, price);
-                    let req = BuyRequest {
-                        symbol: symbol.to_string(),
-                        count,
-                        price_per_share: price,
-                    };
-                    client.buy(req);
-                    // match client.buy_shares(req).await {
-                    //     Ok(res) => info!("Buy Response: {:?}", res.into_inner()),
-                    //     Err(e) => error!("Buy RPC error: {:?}", e),
-                    // }
-                } else {
-                    // Sell
-                    info!(
-                        "Decided to SELL {} shares of {} at {}",
-                        count, symbol, price
-                    );
-                    let req = SellRequest {
-                        symbol: symbol.to_string(),
-                        count,
-                        price_per_share: price,
-                    };
-                    client.sell(req);
-                }
-            }
+            info!("Received trade: {:?}", trade);
+            let data = buffer(100, trade.clone());
+            client.eval_trade(data).await;
         }
         Data::Bar(_) => {
             print!("test");
@@ -81,12 +57,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_key = settings.api_key_id;
     let api_secret = settings.api_secret_key;
     let api_base = settings.api_base_url;
-
     info!("Starting trader with API Base: {}", api_base);
 
     // Connect to Depot
     info!("Connecting to Depot at {}", depot_url);
-    let mut depot_client = DepotClient::connect(depot_url).await?;
+    let depot_client = DepotClient::connect(depot_url).await?;
+
     // Setup Alpaca
     info!("Connecting to Alpaca");
     //TODO put in function

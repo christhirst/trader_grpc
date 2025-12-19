@@ -3,6 +3,7 @@ name = "trader-bot"
 version = "0.1.0"
 edition = "2021"
 
+
 [dependencies]
 apca = "0.30"
 tokio = { version = "1.0", features = ["full"] }
@@ -18,3 +19,10 @@ serde = { version = "1.0", features = ["derive"] }
 
 [build-dependencies]
 tonic-build = "0.13"
+
+
+[lints.clippy]
+unused_variables = "allow"
+
+[lints.rust]
+dead_code = "allow"

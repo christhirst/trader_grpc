@@ -10,7 +10,6 @@ pub fn random_action() {
 mod tests {}
 use rand::Rng;
 
-use super::*;
 
 #[test]
 fn test_random_action() {
