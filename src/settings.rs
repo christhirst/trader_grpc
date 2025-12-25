@@ -4,6 +4,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     pub depot_url: String,
+    pub indicator_url: String,
     pub api_key_id: String,
     pub api_secret_key: String,
     pub api_base_url: String,
@@ -34,9 +35,15 @@ mod tests {
         let settings = settings.unwrap();
 
         // Check default values from config/default.toml
-        assert_eq!(settings.depot_url, "http://[::1]:50051");
+        assert_eq!(
+            settings.depot_url,
+            "http://raynkami-balance-server.sliplane.app:50051"
+        );
+        assert_eq!(
+            settings.indicator_url,
+            "http://raynkami-grpc-indicator.sliplane.app:50051"
+        );
         assert_eq!(settings.api_base_url, "https://paper-api.alpaca.markets");
-        assert_eq!(settings.api_key_id, "FAKE_API_KEY");
-        assert_eq!(settings.api_secret_key, "FAKE_SECRET_KEY");
+        assert_eq!(settings.api_key_id, "PK9ZEOMKSV0ZN7FEZR6F");
     }
 }

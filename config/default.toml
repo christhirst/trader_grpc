@@ -1,4 +1,5 @@
 depot_url = "http://raynkami-balance-server.sliplane.app:50051"
+indicator_url = "http://raynkami-grpc-indicator.sliplane.app:50051"
 #"http://raynkami-balance-server.internal:50051"
 #"http://[::1]:50051"
 api_key_id = "PK9ZEOMKSV0ZN7FEZR6F"
