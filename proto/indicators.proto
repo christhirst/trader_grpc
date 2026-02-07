@@ -6,7 +6,7 @@ package calculate;
 
 service Indicator {
     rpc ConfReload(UserRequest) returns (ConfigResponse);
-    rpc GenList(ListNumbersRequest) returns (ListNumbersResponse);
+    //rpc GenList(ListNumbersRequest) returns (ListNumbersResponse);
     rpc GenListe(ListNumbersRequest2) returns (ListNumbersResponse);
   }
 
@@ -36,7 +36,7 @@ service Indicator {
   */
 
   message UserRequest {  }
-  message ListNumbersRequest  { repeated double list = 2 ; }
+  //message ListNumbersRequest  { repeated double list = 2 ; }
   message ListNumbersRequest2  {
     IndicatorType id = 1;
     Opt opt = 2;

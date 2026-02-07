@@ -1,6 +1,15 @@
 depot_url = "http://raynkami-balance-server.sliplane.app:50051"
-indicator_url = "http://raynkami-grpc-indicator.sliplane.app:50051"
+indicator_url = "http://raynkami-grpc-indicator.sliplane.app:10834"
 #"http://raynkami-balance-server.internal:50051"
 #"http://[::1]:50051"
 api_key_id = "PK9ZEOMKSV0ZN7FEZR6F"
-api_base_url = "https://paper-api.alpaca.markets"
+api_base_url = "https://paper-api.alpaca.markets/vs/test"
+use_mock_data = false
+mock_file_path = "files/orcl.csv"
+top_n_configs = 10
+eval_iterations = 10
+surreal_db_url = "wss://ux-ti-069ps2e29luilf8m9qq0o620g0.aws-euw1.surreal.cloud"
+surreal_db_user = "admin"
+max_trade_percent = 1.0
+max_position_percent = 10.0
+

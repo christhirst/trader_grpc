@@ -9,16 +9,31 @@ apca = "0.30"
 tokio = { version = "1.0", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
-tonic = "0.13"
-prost = "0.13"
-rand = "0.8"
+
+prost = "0.14.1"
+tonic-prost = "0.14.1"
+tonic-reflection = "0.14.1"
+tonic = "0.14.1"
+
+
+rand = "0.9"
 futures = "0.3"
 num-traits = "0.2"
 config = "0.15"
 serde = { version = "1.0", features = ["derive"] }
+chrono = "0.4.42"
+tokio-stream = "0.1.17"
+csv = "1.4.0"
+num-decimal = { version = "0.2.5", default-features = false }
+polars = { version = "0.52.0", features = [
+    "lazy",
+    "csv",
+], default-features = false }
+thiserror = "2.0.18"
+surrealdb = { version = "2.6.0", features = ["protocol-http", "protocol-ws"] }
 
 [build-dependencies]
-tonic-build = "0.13"
+tonic-prost-build = "0.14.1"
 
 
 [lints.clippy]
@@ -26,3 +41,6 @@ unused_variables = "allow"
 
 [lints.rust]
 dead_code = "allow"
+
+[dev-dependencies]
+tempfile = "3.24.0"
